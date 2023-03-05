@@ -1,0 +1,34 @@
+@import '../../node_modules/scss-reset/reset';
+@import './vars';
+@import './themes/light';
+@import './themes/dark';
+
+:root {
+	--header-height: 82px;
+	--main-padding: 25px;
+}
+
+html {
+	font-size: 14px;
+}
+
+#app {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.container {
+	margin: 0 auto;
+	max-width: 1440px;
+	padding: 0 16px;
+
+	@media (min-width: 1024px) {
+		padding: 0 80px;
+	}
+}
+
+body {
+	font-family: 'Nunito Sans', sans-serif;
+	font-size: 14px;
+}
