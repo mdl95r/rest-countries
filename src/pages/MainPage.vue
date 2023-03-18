@@ -76,17 +76,19 @@ function selectCountry() {
 			<div class="container">
 				<ul class="countries-list">
 					<transition-group name="countries-list">
-						<router-link v-for="country in countries" :key="country.name.common" :to="country.name.common" class="country-item" @click="selectCountry">
-							<div class="country-img">
-								<img :src="country.flags[0]" :alt="country.name.common" loading="lazy">
-							</div>
-	
-							<div class="country-item__body">
-								<h2 class="country-title">{{ country?.name.common }}</h2>
-	
-								<card-country :country="country" />
-							</div>
-						</router-link>
+						<li v-for="country in countries" :key="country.name.common" class="country-item">
+							<router-link :to="country.name.common" @click="selectCountry">
+								<div class="country-img">
+									<img :src="country.flags[0]" :alt="country.name.common" loading="lazy">
+								</div>
+		
+								<div class="country-item__body">
+									<h2 class="country-title">{{ country?.name.common }}</h2>
+		
+									<card-country :country="country" />
+								</div>
+							</router-link>
+						</li>
 					</transition-group>
 				</ul>
 			</div>
