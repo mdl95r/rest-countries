@@ -73,7 +73,7 @@ const borders = computed(() => {
 										:key="border"
 										class="border-countries__item"
 									>
-										<router-link :to="border" class="link">
+										<router-link :to="encodeURI(border)" class="link">
 											{{ border }}
 										</router-link>
 									</li>

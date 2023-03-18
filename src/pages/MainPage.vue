@@ -77,7 +77,7 @@ function selectCountry() {
 				<ul class="countries-list">
 					<transition-group name="countries-list">
 						<li v-for="country in countries" :key="country.name.common" class="country-item">
-							<router-link :to="country.name.common" @click="selectCountry">
+							<router-link :to="encodeURI(country.name.common)" @click="selectCountry">
 								<div class="country-img">
 									<img :src="country.flags[0]" :alt="country.name.common" loading="lazy">
 								</div>
