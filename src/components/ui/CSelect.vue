@@ -30,7 +30,14 @@ const closeSelect = () => {
 		<div class="select__selected">{{ selected }}</div>
 		
 		<ul class="select__list">
-			<li v-for="item in items" :key="item" class="select__item" @click="$emit('click-list-item', item)">{{ item }}</li>
+			<li 
+				v-for="item in items" 
+				:key="item" 
+				class="select__item" 
+				@click="$emit('click-list-item', item)"
+			>
+				{{ item }}
+			</li>
 		</ul>
 	</div>
 </template>

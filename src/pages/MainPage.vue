@@ -23,9 +23,7 @@ onMounted(() => {
 	document.title = 'Rest countries';
 });
 
-const countries = computed(() => {
-	return store.getters.countriesByRegion;
-});
+const countries = computed(() => store.getters.countriesByRegion);
 
 const selectValue = (value) => {
 	selected.value = value;
@@ -40,9 +38,7 @@ watch(searchCountry, (val) => {
 	router.push({ path: '/', query: { country: val } });
 });
 
-watch(selected, (val) => {
-	store.commit('setRegion', val);
-});
+watch(selected, (val) => store.commit('setRegion', val));
 
 function selectCountry() {
 	store.commit('setSearchCountry', '');
