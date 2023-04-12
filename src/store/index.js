@@ -1,104 +1,75 @@
-import { createStore } from 'vuex';
+import { defineStore } from 'pinia';
 import axios from 'axios';
 
-export default createStore({
-	state: {
-		countries: [],
-		currentCountry: null,
-		isLoading: false,
-		isError: {
-			status: false,
-			message: ''
-		},
-		searchCountry: '',
-		theme: 'light',
-		region: 'all'
+export const useCountriesStore = defineStore('countries', {
+	state: () => {
+		return {
+			countries: [],
+			currentCountry: null,
+			isLoading: false,
+			isError: {
+				status: false,
+				message: ''
+			},
+			searchCountry: '',
+			theme: 'light',
+			region: 'all'
+		};
 	},
-
 	getters: {
 		baseUrl() {
 			return import.meta.env.VITE_BASE_URL;
 		},
 
-		searchCountries(state) {
-			return state.countries.filter(country => country.name.common.toLowerCase().includes(state.searchCountry.toLowerCase()));
+		searchCountries() {
+			return this.countries.filter(country => country.name.common.toLowerCase().includes(this.searchCountry.toLowerCase()));
 		},
 
-		countriesByRegion(state, getters) {
-			return getters.searchCountries.filter(country => {
+		countriesByRegion() {
+			return this.searchCountries.filter(country => {
 
-				if (state.region.toLowerCase() === 'all') {
-					return getters.searchCountries;
+				if (this.region.toLowerCase() === 'all') {
+					return this.searchCountries;
 				}
 
-				return country.region === state.region;
+				return country.region === this.region;
 			});
 		}
 	},
 
-	mutations: {
-		setCountries(state, val) {
-			state.countries = val;
-		},
-
-		setError(state, bool) {
-			state.isError = bool;
-		},
-
-		setLoading(state, bool) {
-			state.isLoading = bool;
-		},
-
-		setTheme(state, theme) {
-			state.theme = theme;
-		},
-
-		setSearchCountry(state, country) {
-			state.searchCountry = country;
-		},
-
-		setRegion(state, region) {
-			state.region = region;
-		},
-
-		setCurrentCountry(state, country) {
-			state.currentCountry = country;
-		}
-	},
-
 	actions: {
-		async fetchAllCountries({ _, commit, getters }) {
-			commit('setLoading', true);
+		async fetchAllCountries() {
+			this.isLoading = true;
 			try {
-				const { data } = await axios.get(`${getters.baseUrl}/all`, {
+				const { data } = await axios.get(`${this.baseUrl}/all`, {
 					params: {
 						fields: 'name,capital,population,flags,region,cca3',
 					}
 				});
 
-				commit('setCountries', data);
+				this.countries = data;
 			} catch (error) {
-				commit('setError', { status: true, message: error.message });
+				this.isError = { status: true, message: error.message };
 			} finally {
-				commit('setLoading', false);
+				this.isLoading = false;
 			}
 		},
 
-		async fetchCountrybyName({ _, commit, getters }, payload) {
-			commit('setLoading', true);
+		async fetchCountrybyName(payload) {
+			this.isLoading = false;
+
 			try {
-				const res = await axios.get(`${getters.baseUrl}/name/${payload}`);
+				const res = await axios.get(`${this.baseUrl}/name/${payload}`);
 
 				if (res.data.length > 1 || !res.data[0]) {
-					commit('setError', { status: true, message: 'Invalid data' });
+					this.isError = { status: true, message: 'Invalid data' };
 					return;
 				}
-
-				commit('setCurrentCountry', res.data[0]);
+				this.currentCountry = res.data[0];
 			} catch (error) {
-				commit('setError', { status: true, message: error.message });
+				this.isError = { status: true, message: error.message };
 			} finally {
-				commit('setLoading', false);
+				this.isLoading = false;
 			}
 		}
 	}

@@ -2,14 +2,14 @@
 import IconSun from '@/assets/icons/icon-sun.svg?component';
 import IconMoon from '@/assets/icons/icon-moon.svg?component';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useCountriesStore } from '@/store/';
 
-const store = useStore();
-const theme = computed(() => store.state.theme);
+const store = useCountriesStore();
+const theme = computed(() => store.theme);
 
 const switchTheme = () => {
 	const newTheme = theme.value === 'light' ? 'dark' : 'light';
-	store.commit('setTheme', newTheme);
+	store.theme = newTheme;
 	localStorage.setItem('theme', newTheme);
 };
 </script>

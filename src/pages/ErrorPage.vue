@@ -1,9 +1,9 @@
 <script setup>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useCountriesStore } from '@/store/';
 
-const store = useStore();
-const errorMesage = computed(() => store.state.isError.message);
+const store = useCountriesStore();
+const errorMesage = computed(() => store.isError.message);
 </script>
 
 <template>

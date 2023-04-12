@@ -1,16 +1,16 @@
 <script setup>
 import { onMounted, computed } from 'vue';
-import { useStore } from 'vuex';
+import { useCountriesStore } from '@/store/';
 
-const store = useStore();
+const store = useCountriesStore();
 
-const theme = computed(() => store.state.theme);
+const theme = computed(() => store.theme);
 
 onMounted(() => {
 	const localTheme = localStorage.getItem('theme');
 
 	if (localTheme) {
-		store.commit('setTheme', localTheme);
+		store.theme = localTheme;
 	} else {
 		localStorage.setItem('theme', 'light');
 	}

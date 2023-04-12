@@ -1,20 +1,17 @@
 <script setup>
 import { computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
+import { useCountriesStore } from '@/store/';
 import PreloadSpinner from '@/components/PreloadSpinner.vue';
 import ErrorPage from './ErrorPage.vue';
 import IconBack from '@/assets/icons/icon-back.svg?component';
 import CardCountry from '@/components/CardCountry.vue';
 
 const route = useRoute();
-const store = useStore();
+const store = useCountriesStore();
 
 onMounted(() => {
-	if (countries.value.length === 0) {
-		store.dispatch('fetchAllCountries');
-	}
-	store.dispatch('fetchCountrybyName', route.params.country);
+	store.fetchCountrybyName(route.params.country);
 
 	document.title = route.params.country;
 });
@@ -23,21 +20,13 @@ const routeCountry = computed(() => route.params.country);
 
 watch(routeCountry, (val) => {
 	document.title = val;
-	store.dispatch('fetchCountrybyName', val);
+	store.fetchCountrybyName(val);
 });
 
-const isLoading = computed(() => store.state.isLoading);
-
-const isError = computed(() => store.state.isError.status);
-
-const currrentCountry = computed(() => store.state.currentCountry);
-
-const countries = computed(() => store.getters.countriesByRegion);
-
 const borders = computed(() => {
-	return store.getters.countriesByRegion.filter((el) => {
-		if (store.state.currentCountry?.borders) {
-			return store.state.currentCountry.borders.includes(el.cca3);
+	return store.countriesByRegion.filter((el) => {
+		if (store.currentCountry?.borders) {
+			return store.currentCountry.borders.includes(el.cca3);
 		}
 	}).map(el => el.name.common);
 });
@@ -45,11 +34,11 @@ const borders = computed(() => {
 </script>
 
 <template>
-	<template v-if="isError">
+	<template v-if="store.isError.status">
 			<error-page />
 		</template>
 
-		<template v-else-if="!isLoading">
+		<template v-else-if="!store.isLoading">
 
 			<div class="country-detail">
 				<div class="container country-detail__container">
@@ -57,29 +46,27 @@ const borders = computed(() => {
 					<router-link class="link link-back" to="/">
 						<IconBack width="30px" height="20px" viewBox="0 0 35 35"  class="icon-back"/>Back
 					</router-link>
-					<img :src="currrentCountry?.flags[0]" class="country-img" :alt="currrentCountry?.name.common">
+					<img :src="store.currentCountry?.flags[0]" class="country-img" :alt="store.currentCountry?.name.common">
 
 					<div class="country-detail__description">
-						<h2 class="country-title">{{ currrentCountry?.name.common }}</h2>
+						<h2 class="country-title">{{ store.currentCountry?.name.common }}</h2>
 
-						<card-country mode="detail" :country="currrentCountry" />
+						<card-country mode="detail" :country="store.currentCountry" />
 
-						<template v-if="borders.length > 0">
-							<div class="border-countries">
-								<strong>Border Countries:</strong>
-								<ul class="border-countries__list">
-									<li
-										v-for="border in borders" 
-										:key="border"
-										class="border-countries__item"
-									>
-										<router-link :to="encodeURI(border)" class="link">
-											{{ border }}
-										</router-link>
-									</li>
-									</ul>
-								</div>
-						</template>
+						<div v-if="borders.length > 0" class="border-countries">
+							<strong>Border Countries:</strong>
+							<ul class="border-countries__list">
+								<li
+									v-for="border in borders" 
+									:key="border"
+									class="border-countries__item"
+								>
+									<router-link :to="encodeURI(border)" class="link">
+										{{ border }}
+									</router-link>
+								</li>
+								</ul>
+							</div>
 					</div>
 				</div>
 			</div>

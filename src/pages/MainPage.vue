@@ -1,48 +1,46 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
+import { useCountriesStore } from '@/store/';
 import CSelect from '@/components/ui/CSelect.vue';
 import PreloadSpinner from '@/components/PreloadSpinner.vue';
 import CardCountry from '@/components/CardCountry.vue';
 import ErrorPage from './ErrorPage.vue';
 import IconSearch from '@/assets/icons/icon-search.svg?component';
 
+const store = useCountriesStore();
 const items = ref(['All', 'Africa', 'Americas', 'Asia', 'Europe', 'Oceania']);
 const searchCountry = ref('');
 const selected = ref('Filter by region');
 
 const router = useRouter();
-const store = useStore();
 const route = useRoute();
 
 onMounted(() => {
-	store.dispatch('fetchAllCountries');
-	store.commit('setSearchCountry', route.query.country || '');
+	store.fetchAllCountries();
+	store.searchCountry = route.query.country || '';
 	searchCountry.value = route.query.country || '';
 	document.title = 'Rest countries';
 });
-
-const countries = computed(() => store.getters.countriesByRegion);
 
 const selectValue = (value) => {
 	selected.value = value;
 };
 
-const isLoading = computed(() => store.state.isLoading);
+const isLoading = computed(() => store.isLoading);
 
-const isError = computed(() => store.state.isError.status);
+const isError = computed(() => store.isError.status);
 
 watch(searchCountry, (val) => {
-	store.commit('setSearchCountry', val);
+	store.searchCountry = val;
 	router.push({ path: '/', query: { country: val } });
 });
 
 watch(selected, (val) => store.commit('setRegion', val));
 
 function selectCountry() {
-	store.commit('setSearchCountry', '');
-	store.commit('setRegion', 'all');
+	store.currentCountry = null;
+	store.region = 'all';
 }
 </script>
 
@@ -72,7 +70,7 @@ function selectCountry() {
 			<div class="container">
 				<ul class="countries-list">
 					<transition-group name="countries-list">
-						<li v-for="country in countries" :key="country.name.common" class="country-item">
+						<li v-for="country in store.countriesByRegion" :key="country.name.common" class="country-item">
 							<router-link :to="encodeURI(country.name.common)" @click="selectCountry">
 								<div class="country-img">
 									<img :src="country.flags[0]" :alt="country.name.common" loading="lazy">
